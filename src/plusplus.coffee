@@ -142,7 +142,7 @@ module.exports = (robot) ->
     reasons = scoreKeeper.reasonsForUser(name)
 
     reasonString = if typeof reasons == 'object' && Object.keys(reasons).length > 0
-                     reasons_sorted = _sortBy(reasons, (Math.abs(value))
+                     reasons_sorted = _sortBy(reasons, (Math.abs(value)))
                      "#{name} has #{score} points. here are some raisins:" +
                      _.reduce(reasons_sorted, (memo, val, key) ->
                        memo += "\n#{key}: #{val} points"
