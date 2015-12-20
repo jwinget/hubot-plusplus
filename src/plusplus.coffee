@@ -140,11 +140,18 @@ module.exports = (robot) ->
 
     score = scoreKeeper.scoreForUser(name)
     reasons = scoreKeeper.reasonsForUser(name)
+    reason_array = []
+    for k, v of reasons
+      reason_array.push({'reason': k, 'val': v})
+    sorted_reason_array = _.sortBy(reason_array, Math.abs('val'))
+    selected_reasons = _.first(sorted_reason_array, 5)
+    sr_obj = {}
+    for i in selected_reasons
+      sr_obj[i.reason] = i.val
 
-    reasonString = if typeof reasons == 'object' && Object.keys(reasons).length > 0
-                     reasons_sorted = _sortBy(reasons, (Math.abs(value)))
+    reasonString = if typeof sr_obj == 'object' && Object.keys(sr_obj).length > 0
                      "#{name} has #{score} points. here are some raisins:" +
-                     _.reduce(reasons_sorted, (memo, val, key) ->
+                     _.reduce(sr_obj, (memo, val, key) ->
                        memo += "\n#{key}: #{val} points"
                      , "")
                    else
