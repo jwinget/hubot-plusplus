@@ -142,15 +142,12 @@ module.exports = (robot) ->
     reasons = scoreKeeper.reasonsForUser(name)
     
     if reasons.length > 0
-      reasonString = "#{name} has #{score} points. Here are some #{reasonsKeyword}:"
+      reasonString = "#{name} has #{score} points. Some #{reasonsKeyword}:"
       for i in [0..reasons.length-1]
         reasonString += "\n#{reasons[i].key}: #{reasons[i].val} points"
     else
       reasonString = "#{name} has #{score} points."
-	
-	msg.send reasonString
-
-
+    
     msg.send reasonString
 
   robot.respond /(top|bottom) (\d+)/i, (msg) ->
