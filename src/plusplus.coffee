@@ -141,10 +141,26 @@ module.exports = (robot) ->
     score = scoreKeeper.scoreForUser(name)
     reasons = scoreKeeper.reasonsForUser(name)
     
-    if reasons.length > 0
+    reasonString = if typeof reasons == 'object' && Object.keys(reasons).length > 0
+                     "#{name} has #{score} points. Here are some #{reasonsKeyword}:" +
+                     _.reduce(reasons, (memo, val, key) ->
+                       memo += "\n#{key}: #{val} points"
+                     , "")
+                   else
+                     "#{name} has #{score} points."
+                
+    msg.send reasonString
+
+    topreasons = []
+    for key, val of reasons
+      topreasons.push(key: key, val: val)
+    
+    topreasons.sort((a,b) -> Math.abs(b.val) - Math.abs(a.val)).slice(0,10)
+    
+    if topreasons.length > 0
       reasonString = "#{name} has #{score} points. Some #{reasonsKeyword}:"
-      for i in [0..reasons.length-1]
-        reasonString += "\n#{reasons[i].key}: #{reasons[i].val} points"
+      for i in [0..topreasons.length-1]
+        reasonString += "\n#{topreasons[i].key}: #{topreasons[i].val} points"
     else
       reasonString = "#{name} has #{score} points."
     
