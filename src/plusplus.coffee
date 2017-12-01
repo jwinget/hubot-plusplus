@@ -160,11 +160,17 @@ module.exports = (robot) ->
     sortReasons = []
     for raisin, weight of reasons
       sortReasons.push(raisin:raisin, weight:weight)
+      
+    sortReasons.sort((a,b) -> Math.abs(b.weight) - Math.abs(a.weight))
+    topReasons = sortReasons.slice(0,5)
     
-    sortReasons = sortReasons.sort((a,b) -> Math.abs(b.weight) - Math.abs(a.weight)).slice(0,10)
+    if sortReasons.length > 5
+      j = Math.floor( Math.random() * (sortReasons.length-5) )
+      topReasons.push( sortReasons[j] )
+    
     reasonString = "#{name} has #{score} points. Some #{reasonsKeyword}:"
-    for i in [0..sortReasons.length-1]
-      reasonString += "\n#{sortReasons[i].raisin}: #{sortReasons[i].weight} points"
+    for i in [0..topReasons.length-1]
+      reasonString += "\n#{topReasons[i].raisin}: #{topReasons[i].weight} points"
                 
     msg.send reasonString
 
