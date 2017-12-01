@@ -165,7 +165,7 @@ module.exports = (robot) ->
     topReasons = sortReasons.slice(0,5)
     
     if sortReasons.length > 5
-      j = Math.floor( Math.random() * (sortReasons.length-5) )
+      j = Math.floor( Math.random() * (sortReasons.length-5) ) + 5
       topReasons.push( sortReasons[j] )
     
     reasonString = "#{name} has #{score} points. Some #{reasonsKeyword}:"
