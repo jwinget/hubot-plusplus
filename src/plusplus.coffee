@@ -151,21 +151,6 @@ module.exports = (robot) ->
                 
     msg.send reasonString
 
-    topreasons = []
-    for key, val of reasons
-      topreasons.push(key: key, val: val)
-    
-    topreasons.sort((a,b) -> Math.abs(b.val) - Math.abs(a.val)).slice(0,10)
-    
-    if topreasons.length > 0
-      reasonString = "#{name} has #{score} points. Some #{reasonsKeyword}:"
-      for i in [0..topreasons.length-1]
-        reasonString += "\n#{topreasons[i].key}: #{topreasons[i].val} points"
-    else
-      reasonString = "#{name} has #{score} points."
-    
-    msg.send reasonString
-
   robot.respond /(top|bottom) (\d+)/i, (msg) ->
     amount = parseInt(msg.match[2]) || 10
     message = []
