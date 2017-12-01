@@ -6,14 +6,23 @@
 #   "clark": "0.0.6"
 #
 # Configuration:
+#   HUBOT_PLUSPLUS_KEYWORD: the keyword that will make hubot give the
+#   score for a name and the reasons. For example you can set this to
+#   "score|karma" so hubot will answer to both keywords.
+#   If not provided will default to 'score'.
+#
+#   HUBOT_PLUSPLUS_REASON_CONJUNCTIONS: a pipe separated list of conjuntions to
+#   be used when specifying reasons. The default value is
+#   "for|because|cause|cuz|as", so it can be used like:
+#   "foo++ for being awesome" or "foo++ cuz they are awesome".
 #
 # Commands:
-#   <name>++
-#   <name>--
-#   hubot score <name> [for <reason>]
-#   hubot top <amount>
-#   hubot bottom <amount>
-#   hubot erase <user> [<reason>]
+#   <name>++ [<reason>] - Increment score for a name (for a reason)
+#   <name>-- [<reason>] - Decrement score for a name (for a reason)
+#   hubot score <name> - Display the score for a name and some of the reasons
+#   hubot top <amount> - Display the top scoring <amount>
+#   hubot bottom <amount> - Display the bottom scoring <amount>
+#   hubot erase <name> [<reason>] - Remove the score for a name (for a reason)
 #
 # URLs:
 #   /hubot/scores[?name=<name>][&direction=<top|botton>][&limit=<10>]
@@ -29,19 +38,22 @@ ScoreKeeper = require('./scorekeeper')
 
 module.exports = (robot) ->
   scoreKeeper = new ScoreKeeper(robot)
+  scoreKeyword   = process.env.HUBOT_PLUSPLUS_KEYWORD or 'score'
+  reasonsKeyword = process.env.HUBOT_PLUSPLUS_REASONS or 'raisins'
+  reasonConjunctions = process.env.HUBOT_PLUSPLUS_CONJUNCTIONS or 'for|because|cause|cuz|as'
 
   # sweet regex bro
   robot.hear ///
     # from beginning of line
     ^
     # the thing being upvoted, which is any number of words and spaces
-    ([\s\w'@.\-:]*)
+    ([\s\w'@.\-:\u3040-\u30FF\uFF01-\uFF60\u4E00-\u9FA0]*)
     # allow for spaces after the thing being upvoted (@user ++)
     \s*
     # the increment/decrement operator ++ or --
     (\+\+|--|—)
     # optional reason for the plusplus
-    (?:\s+(?:for|because|cause|cuz)\s+(.+))?
+    (?:\s+(?:#{reasonConjunctions})\s+(.+))?
     $ # end of line
   ///i, (msg) ->
     # let's get our local vars in place
@@ -73,7 +85,10 @@ module.exports = (robot) ->
     if score?
       message = if reason?
                   if reasonScore == 1 or reasonScore == -1
-                    "#{name} has #{score} points, #{reasonScore} of which is for #{reason}."
+                    if score == 1 or score == -1
+                      "#{name} has #{score} point for #{reason}."
+                    else
+                      "#{name} has #{score} points, #{reasonScore} of which is for #{reason}."
                   else
                     "#{name} has #{score} points, #{reasonScore} of which are for #{reason}."
                 else
@@ -96,7 +111,7 @@ module.exports = (robot) ->
   robot.respond ///
     (?:erase )
     # thing to be erased
-    ([\s\w'@.-:]+?)
+    ([\s\w'@.-:\u3040-\u30FF\uFF01-\uFF60\u4E00-\u9FA0]*)
     # optionally erase a reason from thing
     (?:\s+(?:for|because|cause|cuz)\s+(.+))?
     $ # eol
@@ -127,7 +142,8 @@ module.exports = (robot) ->
                   "Erased points for #{name}"
       msg.send message
 
-  robot.respond /score (for\s)?(.*)/i, (msg) ->
+  # Catch the message asking for the score.
+  robot.respond new RegExp("(?:" + scoreKeyword + ") (for\s)?(.*)", "i"), (msg) ->
     name = msg.match[2].trim().toLowerCase()
 
     if name
