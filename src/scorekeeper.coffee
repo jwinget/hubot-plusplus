@@ -86,8 +86,10 @@ class ScoreKeeper
   reasonsForUser: (user) ->
     user = @getUser(user)
     topreasons = []
-	  for key, val of @storage.reasons[user]
-		  topreasons.push(key: key, val: val)
+    
+    for key, val of @storage.reasons[user]
+      topreasons.push(key: key, val: val)
+    
     topreasons.sort((a,b) -> Math.abs(b.val) - Math.abs(a.val)).slice(0,10)
 
   saveScoreLog: (user, from, room, reason) ->
