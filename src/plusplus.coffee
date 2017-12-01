@@ -165,14 +165,6 @@ module.exports = (robot) ->
     reasonString = "#{name} has #{score} points. Some #{reasonsKeyword}:"
     for i in [0..sortReasons.length-1]
       reasonString += "\n#{sortReasons[i].raisin}: #{sortReasons[i].weight} points"
-    
-    reasonString = if typeof reasons == 'object' && Object.keys(reasons).length > 0
-                     "#{name} has #{score} points. Here are some #{reasonsKeyword}:" +
-                     _.reduce(reasons, (memo, val, key) ->
-                       memo += "\n#{key}: #{val} points"
-                     , "")
-                   else
-                     "#{name} has #{score} points."
                 
     msg.send reasonString
 
